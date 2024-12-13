@@ -14,11 +14,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set environment variables
-      run: |
-        echo "TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}" >> $GITHUB_ENV
-        echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> $GITHUB_ENV
-    
     - name: Get current time in UTC
       id: get-time  # 设置一个ID来存储时间
       run: echo "TIME=$(date -u '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
@@ -36,17 +31,3 @@ jobs:
           mkdir -p ~/log && \
           echo '${{ env.TIME }} Logged in via GitHub Action.' >> ~/log/keep-action.log
         "
-
-    - name: Send Telegram notification on success
-      if: success() && env.TELEGRAM_CHAT_ID != '' && env.TELEGRAM_BOT_TOKEN != ''  # 如果 SSH 登录成功
-      run: |
-        curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-          -d text="UTC ${{ env.TIME }} : ✅ SSH login to server( ${{ secrets.SERVER_IP }} ) was successful!"
-
-    - name: Send Telegram notification on failure
-      if: failure() && env.TELEGRAM_CHAT_ID != '' && env.TELEGRAM_BOT_TOKEN != ''  # 如果 SSH 登录失败
-      run: |
-        curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
-          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-          -d text="UTC ${{ env.TIME }} : ❌ SSH login to server( ${{ secrets.SERVER_IP }} ) failed!"
