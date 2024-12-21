@@ -1,9 +1,9 @@
-name: SSH Login Every 3 Days
+name: SSH Login Every Day
 
-# 定义触发条件：每三天触发一次
+# 定义触发条件：每天早上7点触发一次
 on:
   schedule:
-    - cron: '0 0 */3 * *'  # 每三天的 00:00 触发
+    - cron: '0 7 * * *'  # 每天早上 07:00 触发
   workflow_dispatch:
 
 jobs:
@@ -29,5 +29,6 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.SERVER_IP }} "
           mkdir -p ~/log && \
-          echo '${{ env.TIME }} Logged in via GitHub Action.' >> ~/log/keep-action.log
+          echo '${{ env.TIME }} Logged in via GitHub Action.' >> ~/log/keep-action.log && \
+          ./sbox.sh
         "
